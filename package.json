@@ -1,0 +1,25 @@
+{
+  "name": "html2markdown-ifttt",
+  "version": "1.0.0",
+  "description": "A lightweight HTML to Markdown converter",
+  "main": "parser.ts",
+  "scripts": {
+    "test": "ts-node-test tests/"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SierraSoftworks/html2markdown-ifttt.git"
+  },
+  "author": "Benjamin Pannell <admin@sierrasoftworks.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SierraSoftworks/html2markdown-ifttt/issues"
+  },
+  "homepage": "https://github.com/SierraSoftworks/html2markdown-ifttt#readme",
+  "devDependencies": {
+    "typescript": "^4.9.4",
+    "@types/node": "^18.11.18",
+    "ts-node-test": "^0.3.0"
+  }
+}
