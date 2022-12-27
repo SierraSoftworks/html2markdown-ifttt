@@ -1,6 +1,21 @@
 export abstract class _Node {
     abstract kind(): string
     abstract toString(): string
+    abstract simplify(): _Node
+}
+
+export class _EmptyNode extends _Node {
+    kind() {
+        return 'empty'
+    }
+
+    toString() {
+        return ''
+    }
+
+    simplify(): _EmptyNode {
+        return this
+    }
 }
 
 export class _TextNode extends _Node {
@@ -14,6 +29,14 @@ export class _TextNode extends _Node {
 
     toString() {
         return this.text
+    }
+
+    simplify(): _Node {
+        if (this.text.trim().length === 0) {
+            return new _EmptyNode()
+        }
+
+        return new _TextNode(this.text)
     }
 }
 
@@ -30,6 +53,32 @@ export class _TagNode extends _Node {
         const attrs = Object.keys(this.attrs).map(key => `${key}="${this.attrs[key]}"`).join(' ')
         return `<${this.tag}${attrs ? ` ${attrs}` : ''}>${this.children.map(c => c.toString()).join('')}</${this.tag}>`
     }
+
+    simplify() {
+        return new _TagNode(this.tag, this.attrs, this.children.map(c => c.simplify()).filter(c => !(c instanceof _EmptyNode)))
+    }
+}
+
+export function _unescapeHtml(input: string): string {
+    const replacements = {
+        '&lt;': '<',
+        '&gt;': '>',
+        '&amp;': '&',
+        '&quot;': '"',
+        '&apos;': "'",
+        '&nbsp;': '\u00a0',
+    }
+
+    return input.replace(/&(?:\w+|#\d+|#x\d+|#X\d+);/g, match => {
+        if (match[1] === '#') {
+            if (match[2].toLowerCase() === 'x')
+                return String.fromCharCode(parseInt(match.substring(3, match.length - 1), 16))
+            
+            return String.fromCharCode(parseInt(match.substring(2, match.length - 1), 10))
+        }
+
+        return replacements[match] || match
+    })
 }
 
 // Parses a string containing XML node attributes into a dictionary.
@@ -114,7 +163,7 @@ export function _parseAttributes(input: string): { [key: string]: string } {
         }
 
         const key = parseKey()
-        const value = parseValue()
+        const value = _unescapeHtml(parseValue())
         attrs[key] = value
     }
 
@@ -129,6 +178,10 @@ export function _parseHtml(input: string): _Node[] {
     let cursor = 0
 
     function push(node: _Node) {
+        if (node instanceof _TextNode && node.text.length === 0) {
+            return
+        }
+
         if (stack.length > 0) {
             const parent = stack[stack.length - 1]
             if (parent instanceof _TagNode) {
@@ -148,12 +201,12 @@ export function _parseHtml(input: string): _Node[] {
     while (cursor < input.length) {
         const nextTag = input.indexOf('<', cursor)
         if (nextTag === -1) {
-            push(new _TextNode(input.substring(cursor)))
+            push(new _TextNode(_unescapeHtml(input.substring(cursor))))
             break
         }
 
         if (nextTag > cursor) {
-            push(new _TextNode(input.substring(cursor, nextTag)))
+            push(new _TextNode(_unescapeHtml(input.substring(cursor, nextTag))))
         }
 
         const endTag = input.indexOf('>', nextTag)
@@ -185,7 +238,7 @@ export function _parseHtml(input: string): _Node[] {
         cursor = endTag + 1
     }
 
-    return nodes
+    return nodes.map(n => n.simplify()).filter(n => !(n instanceof _EmptyNode))
 }
 
 export class _NodeVisitor {

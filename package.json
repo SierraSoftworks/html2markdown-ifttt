@@ -4,9 +4,9 @@
   "description": "A lightweight HTML to Markdown converter",
   "main": "parser.ts",
   "scripts": {
-    "test": "ts-node-test tests/"
+    "test": "ts-node ./node_modules/jasmine/bin/jasmine",
+    "watch": "ts-node-dev --respawn -- ./node_modules/jasmine/bin/jasmine"
   },
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SierraSoftworks/html2markdown-ifttt.git"
@@ -19,7 +19,9 @@
   "homepage": "https://github.com/SierraSoftworks/html2markdown-ifttt#readme",
   "devDependencies": {
     "typescript": "^4.9.4",
-    "@types/node": "^18.11.18",
-    "ts-node-test": "^0.3.0"
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "jasmine": "^4.5.0",
+    "@types/jasmine": "^4.3.1"
   }
 }

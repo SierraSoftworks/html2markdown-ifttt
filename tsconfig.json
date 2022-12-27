@@ -2,6 +2,7 @@
     "compilerOptions": {
         "lib": ["es2015"],
         "target": "ES5",
-        "module": "ES6"
+        "module": "Node16",
+        "allowSyntheticDefaultImports": true
     }
 }
