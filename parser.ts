@@ -1,16 +1,11 @@
 export abstract class _Node {
     abstract kind(): string
-    abstract toString(): string
     abstract simplify(): _Node
 }
 
 export class _EmptyNode extends _Node {
     kind() {
         return 'empty'
-    }
-
-    toString() {
-        return ''
     }
 
     simplify(): _EmptyNode {
@@ -25,10 +20,6 @@ export class _TextNode extends _Node {
 
     kind() {
         return 'text'
-    }
-
-    toString() {
-        return this.text
     }
 
     simplify(): _Node {
@@ -47,11 +38,6 @@ export class _TagNode extends _Node {
 
     kind() {
         return `<${this.tag}/>`
-    }
-
-    toString() {
-        const attrs = Object.keys(this.attrs).map(key => `${key}="${this.attrs[key]}"`).join(' ')
-        return `<${this.tag}${attrs ? ` ${attrs}` : ''}>${this.children.map(c => c.toString()).join('')}</${this.tag}>`
     }
 
     simplify() {
