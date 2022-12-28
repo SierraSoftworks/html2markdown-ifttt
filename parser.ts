@@ -46,7 +46,9 @@ export class _TagNode extends _Node {
 }
 
 export function _unescapeHtml(input: string): string {
-    const replacements = {
+    const replacements: {
+        [code: string]: string
+    } = {
         '&lt;': '<',
         '&gt;': '>',
         '&amp;': '&',
