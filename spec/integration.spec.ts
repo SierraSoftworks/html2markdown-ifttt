@@ -21,5 +21,21 @@ describe('htmlToMarkdown', () => {
 
             expect(htmlToMarkdown(raw).split('\n').filter(x => !!x)).toEqual(expected)
         })
+
+        it("should convert a Tailscale update description correctly", () => {
+            const raw = `<h6 id="linux">Linux</h6> <ul> <li>Fixed: Handling of a very large number of SplitDNS domains with an exit node</li> </ul> <h6 id="macos">macOS</h6> <ul> <li>Fixed: UI glitch with macOS 10.14 and 10.13</li> </ul> <h6 id="windows">Windows</h6> <ul> <li>Fixed: Custom server URL from registry key support</li> </ul> <h6 id="synology">Synology</h6> <ul> <li>Fixed: Crashes manifesting on ARM-based platforms and models with very old kernels</li> </ul> `
+            const expected = [
+                `###### Linux`,
+                `- Fixed: Handling of a very large number of SplitDNS domains with an exit node`,
+                `###### macOS`,
+                `- Fixed: UI glitch with macOS 10.14 and 10.13`,
+                `###### Windows`,
+                `- Fixed: Custom server URL from registry key support`,
+                `###### Synology`,
+                `- Fixed: Crashes manifesting on ARM-based platforms and models with very old kernels`
+            ]
+
+            expect(htmlToMarkdown(raw).split('\n').filter(x => !!x)).toEqual(expected)
+        })
     })
 })

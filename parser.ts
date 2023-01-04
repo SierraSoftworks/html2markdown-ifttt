@@ -252,6 +252,9 @@ export class _NodeVisitor {
 export class _MarkdownVisitor extends _NodeVisitor {
     public output: string = ''
 
+    private listStack: ("1." | "-")[] = []
+    private inCodeBlock: boolean = false
+
     onText(node: _TextNode): void {
         this.output += node.text
     }
@@ -332,15 +335,25 @@ export class _MarkdownVisitor extends _NodeVisitor {
     }
 
     pre(node: _TagNode): void {
+        const wasInCodeBlock = this.inCodeBlock
+        this.inCodeBlock = true
         this.output += `\`\`\`\n`
         super.onTag(node)
         this.output += `\n\`\`\``
+        this.inCodeBlock = wasInCodeBlock
     }
 
     code(node: _TagNode): void {
-        this.output += `\``
-        super.onTag(node)
-        this.output += `\``
+        if (!this.inCodeBlock)
+        {
+            this.output += `\``
+            super.onTag(node)
+            this.output += `\``
+        }
+        else
+        {
+            super.onTag(node)
+        }
     }
 
     a(node: _TagNode): void {
@@ -366,17 +379,23 @@ export class _MarkdownVisitor extends _NodeVisitor {
     }
 
     ul(node: _TagNode): void {
+        this.listStack.push('-')
         this.output += `\n`
         super.onTag(node)
+        this.output += `\n`
+        this.listStack.pop()
     }
 
     ol(node: _TagNode): void {
+        this.listStack.push('1.')
         this.output += `\n`
         super.onTag(node)
+        this.output += `\n`
+        this.listStack.pop()
     }
 
     li(node: _TagNode): void {
-        this.output += `\n* `
+        this.output += `\n${this.listStack[this.listStack.length - 1]} `
         super.onTag(node)
     }
 
